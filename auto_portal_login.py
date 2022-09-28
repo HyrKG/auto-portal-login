@@ -14,7 +14,7 @@ passwd = None
 
 def spawn_and_read_config():
     global config_path
-    config_path = os.path.join(os.getcwd(), "config.ini")
+    config_path = os.path.join(os.getcwd(), "auto-pl-config.ini")
     config.read(config_path)
 
     if not os.path.exists(config_path):
