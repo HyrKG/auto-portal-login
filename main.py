@@ -2,6 +2,7 @@ import os
 
 import term_login
 import configparser
+from time import sleep
 
 config = configparser.ConfigParser()
 
@@ -33,18 +34,42 @@ def spawn_and_read_config():
 
 
 if __name__ == '__main__':
-
-    term = term_login.request_term();
+    # 保存或读取配置
     spawn_and_read_config()
 
-    print("正在联系169.cn中...")
-    if term.is_logged():
-        print("你已登录...!")
-    else:
-        print("即将尝试登录...")
-        if account == None or account == "your-account-here":
-            print(fr"请先完成配置! {config_path}")
-        else:
-            term.termtype = term_type
-            term.login(account, passwd)
-            print("执行完成，若回执中result为1则表示登录成功...!")
+    # 至多允许尝试60次
+    retryTimes: int = 1
+    closeFlag: bool = False
+
+    while not closeFlag and retryTimes <= 60:
+        # 发起请求，补全term
+        print("正在联系169.cn中...x" + str(retryTimes))
+
+        term = None
+        try:
+            term = term_login.request_term();
+        except Exception:
+            print('发生了错误!请等待重试...')
+
+        if term is not None:
+            if term.is_logged():
+                print("你已登录...!")
+                closeFlag = True
+            else:
+                print("即将尝试登录...")
+                if account is None or account == "your-account-here":
+                    print(fr"请先完成配置! {config_path}")
+                    closeFlag = True
+                else:
+                    term.termtype = term_type
+                    result = term.login(account, passwd)
+                    print(result)
+        retryTimes += 1
+        sleep(2)
+
+    if not closeFlag:
+        print("无法连接，请确保电脑会自动连接校园网！")
+    print("")
+    print("#> 程序结束，将在3秒后退出")
+    sleep(3)
+    print("...exit")

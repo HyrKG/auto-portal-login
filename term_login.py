@@ -44,7 +44,7 @@ class Term:
                                 self.wlanacip,
                                 self.wlanacname])
         complete_url = url + "&" + query
-        print(requests.get(complete_url).content)
+        return requests.get(complete_url).content
 
     def is_valid(self, except_netloc: str) -> bool:
         return len(self.netloc.strip()) > 0 and self.netloc == except_netloc
