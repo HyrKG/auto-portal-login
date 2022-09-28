@@ -23,7 +23,9 @@ def spawn_and_read_config():
         config.set("general", "account", "your-account-here")
         config.set("general", "password", "your-passwd-here")
         config.write(open(config_path, 'a'))
-        print(fr"已生成配置于 {config} ,请完成配置后再次开启！")
+        print(fr"已生成配置于 {config_path} ,请完成配置后再次开启！该界面将于10秒后关闭！")
+        sleep(10)
+        exit()
     else:
         global term_type
         term_type = int(config.get("general", "term-type"))
@@ -41,7 +43,7 @@ if __name__ == '__main__':
     retryTimes: int = 1
     closeFlag: bool = False
 
-    while not closeFlag and retryTimes <= 60:
+    while not closeFlag and retryTimes <= 120:
         # 发起请求，补全term
         print("正在联系169.cn中...x" + str(retryTimes))
 
@@ -58,14 +60,17 @@ if __name__ == '__main__':
             else:
                 print("即将尝试登录...")
                 if account is None or account == "your-account-here":
-                    print(fr"请先完成配置! {config_path}")
-                    closeFlag = True
+                    print(fr"已生成配置于 {config_path} ,请完成配置后再次开启！该界面将于10秒后关闭！")
+                    sleep(10)
+                    exit()
                 else:
                     term.termtype = term_type
                     result = term.login(account, passwd)
                     print(result)
+        if not closeFlag:
+            print("....等待下一次验证")
         retryTimes += 1
-        sleep(2)
+        sleep(1)
 
     if not closeFlag:
         print("无法连接，请确保电脑会自动连接校园网！")
